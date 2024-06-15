@@ -11,15 +11,15 @@ const userController = {
         }
 
         try { 
-            const registerValidation = userService.addNewUser(email, password);
+            const token = userService.addNewUser(email, password);
         
-            if(registerValidation == Error) {
+            if(token == Error) {
                 return res.status(500).send("Erro no cadastro de usuário");
             }
         
-            res.status(201).send(registerValidation);
+            res.status(201).send(token);
         } catch(err) {
-            res.status(500).send("Erro no servidor");
+            res.status(500).send("Erro no servidor\n");
         }
     },
 
@@ -33,20 +33,22 @@ const userController = {
 
         try { 
             await userService.validateLogin(email, password).then(
-                (loginValidation) => {
-                    if(!loginValidation.auth) {
-                        return res.status(401).send('Senha incorreta\n');
+                (token) => {
+                    res.cookie("token", token, {httpOnly: true});
+
+                    res.status(200).send(token);
+                },
+                (token) => {
+                    if(!token) {
+                        return res.status(401).send('Email não encontrado\n');
                     }
 
-                    res.status(200).send(loginValidation);
-                },
-                () => {
-                    return res.status(404).send('Email não encontrado\n');
+                    return res.status(404).send('Senha incorreta\n');
                 }
             );
         } catch(err) {
             console.log(err);
-            res.status(500).send("Erro no servidor");
+            res.status(500).send("Erro no servidor\n");
         }
     }
 }

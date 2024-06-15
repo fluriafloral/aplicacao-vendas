@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const cookies = require('cookie-parser');
 require('dotenv/config');
 
 // Local modules
@@ -13,26 +14,26 @@ const app = express();
 
 // Environment Variables 
 const port = process.env.PORT;
+const jwt_key = process.env.PRIVATE_KEY;
  
 // Middlewares 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.json());
+app.use(cookies());
 
 // Function to authenticate JWT token
 function verifyToken(req, res, next) {
-    const token = req.headers['x-access-token'];
+    const token = req.headers['token'];
     if (!token) {
-        return res.status(403).send('Token não pode ser vazio');
+        return res.status(403).send('Token não pode ser vazio\n');
     }
 
-    jwt.verify(token, jwt_key, (err, decoded) => {
-        if(err) {
-            return res.status(500).send('Falha na autenticação do token');
-        }
+    const userID = jwt.verify(token, jwt_key);
 
-        req.userId = decoded.id;
-        next();
-    });
+    req.userID = userID;
+    next();
+    
 }
 
 // Endpoints
@@ -50,6 +51,6 @@ app.listen(port, (error) =>{
     if(error)
         console.log("Erro na inicialização do servidor")
     else
-        console.log("Servidor iniciado com sucesso! Aplicação escutando na porta " + port);
+        console.log(`Servidor iniciado com sucesso! Aplicação escutando na porta ${port}`);
     }
 );

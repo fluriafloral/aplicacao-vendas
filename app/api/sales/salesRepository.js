@@ -36,11 +36,11 @@ const salesRepository = {
     },
 
     // Inserts new sale in sales
-    createSale: (costumer_name, product, value, sale_date, user_id) => {
+    createSale: (customerName, product, value, saleDate, userID) => {
         let db = InitializeDatabaseObj();
 
-        let query = 'INSERT INTO sales(costumer_name, product, value, sale_date, user_id) VALUES(?, ?, ?, ?, ?)';
-        db.run(query, [costumer_name, product, value, sale_date, user_id], (err) => {
+        let query = 'INSERT INTO sales(customer_name, product, value, sale_date, user_id) VALUES(?, ?, ?, ?, ?)';
+        db.run(query, [customerName, product, value, saleDate, userID], (err) => {
             if(err) {
                 throw err;
             }
@@ -52,17 +52,17 @@ const salesRepository = {
     },
 
     // Edits existing sale
-    updateSale: (sale_id, costumer_name, product, value, sale_date) => {
+    updateSale: (sale_id, customer_name, product, value, sale_date) => {
         return new Promise((resolve, reject) => {
             let db = InitializeDatabaseObj();
 
-            let query = 'UPDATE sales SET costumer_name = ?, product = ?, value = ?, sale_date = ? WHERE id = ?';
-            db.run(query, [costumer_name, product, value, sale_date, sale_id], (err) => {
+            let query = 'UPDATE sales SET customer_name = ?, product = ?, value = ?, sale_date = ? WHERE id = ?';
+            db.run(query, [customer_name, product, value, sale_date, sale_id], (err) => {
                 if (err) {
                     return reject(err);
                 }
 
-                resolve({sale_id, costumer_name, product, value, sale_date, user_id});
+                resolve({sale_id, customer_name, product, value, sale_date, user_id});
             });
 
             db.close();
@@ -79,7 +79,7 @@ const salesRepository = {
                     return reject(err);
                 }
 
-                resolve();
+                resolve(sale_id);
             })
 
             db.close();

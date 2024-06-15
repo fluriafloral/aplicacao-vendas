@@ -27,8 +27,8 @@ const salesController = {
         const {costumerName, product, value, saleDate} = req.body;
 
         try {
-            const saleID = salesService.addNewSale(costumerName, product, value, saleDate, req.userId);
-            res.status(200).send(saleID);
+            const saleID = salesService.addNewSale(costumerName, product, value, saleDate, req.userID);
+            res.status(200).json({id: saleID});
         } catch(err) {
             res.status(500).send("Erro no servidor");
         }
@@ -45,11 +45,11 @@ const salesController = {
                     res.status(200).send(row);
                 },
                 () => {
-                    return res.status(500).send("Erro na edição");
+                    return res.status(500).send("Erro na edição\n");
                 }
             );
         } catch(err) {
-            res.status(500).send("Erro no servidor");
+            res.status(500).send("Erro no servidor\n");
         }
     },
 
@@ -63,11 +63,11 @@ const salesController = {
                     res.status(200);
                 },
                 () => {
-                    return res.status(500).send("Erro na exclusão");
+                    return res.status(500).send("Erro na exclusão\n");
                 }
             );
         } catch(err) {
-            res.status(500).send("Erro no servidor");
+            res.status(500).send("Erro no servidor\n");
         }
     },
 
@@ -81,11 +81,11 @@ const salesController = {
                     res.download(filename);
                 },
                 () => {
-                    return res.status(500).send("Erro na geração de PDF");
+                    return res.status(500).send("Erro na geração de PDF\n");
                 }
             );
         } catch(err) {
-            res.status(500).send("Erro no servidor");
+            res.status(500).send("Erro no servidor\n");
         }
     }
 }

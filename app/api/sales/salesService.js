@@ -8,21 +8,21 @@ const salesRepository = require('./salesRepository');
 const salesService = {
     // Calls salesRepository to get all sales from table
     getAllSales: async () => {
-        await salesRepository.getSales().then(
-            (sales) => {
-                return sales;
-            },
-            (err) => {
-                console.log(err);
-                return err;
+        return new Promise(async (resolve, reject) => {
+            const sales = await salesRepository.getSales();
+
+            if(!sales) {
+                return reject(err);
             }
-        );
+
+            resolve(sales);
+        });
     },
 
     // Calls salesRepository to insert new sale
-    addNewSale: (costumer_name, product, value, sale_date, user_id) => {
+    addNewSale: (costumerName, product, value, saleDate, userID) => {
         try {
-            return salesRepository.createSale(costumer_name, product, value, sale_date, user_id);
+            return salesRepository.createSale(costumerName, product, value, saleDate, userID);
         } catch(err) {
             console.log(err);
             return err;
@@ -30,58 +30,58 @@ const salesService = {
     },
 
     // Calls salesRepository to update a row in sales
-    editSale: async (sale_id, costumer_name, product, value, sale_date) => {
-        await salesRepository.updateSale(sale_id, costumer_name, product, value, sale_date).then(
-            (row) => {
-                return row;
-            },
-            (err) => {
-                console.log(err);
-                return err;
+    editSale: async (saleID, costumerName, product, value, saleDate) => {
+        return new Promise(async (resolve, reject) => {
+            const row = await salesRepository.updateSale(saleID, costumerName, product, value, saleDate);
+            
+            if(!row) {
+                return reject(err);
             }
-        );
+
+            resolve(row);
+        });
     },
 
     // Calls salesRepository to delete a row in sales
-    deleteSale: async (sale_id) => {
-        await salesRepository.deleteSale(sale_id).then(
-            () => {
+    deleteSale: async (saleID) => {
+        return new Promise(async (resolve, reject) => {
+            const saleID = await salesRepository.deleteSale(saleID);
 
-            },
-            (err) => {
-                console.log(err);
-                return err;
+            if(!saleID) {
+                reject(err);
             }
-        );
+
+            resolve(saleID);
+        });
     },
 
     // Calls salesRepository to get sales in a date range
     generateSalesPDF: async (startDate, endDate) => {
-        await salesRepository.getSalesInDateRange(startDate, endDate).then(
-            async (sales) => {
-                const doc = new pdf({margin: 30, size: 'A4'});
-                const filename = `sales_${startDate}_${endDate}.pdf`;
-                doc.pipe(fs.createWriteStream(filename));
+        return new Promise(async (resolve, reject) => {
+            const sales = await salesRepository.getSalesInDateRange(startDate, endDate);
 
-                // Table
-                const table = {
-                    title: `Vendas entre ${startDate} e ${endDate}`,
-                    headers: ['ID', 'Nome do cliente', 'Produto', 'Valor', 'Data da venda', 'ID do vendedor'],
-                    rows: sales
-                };
-
-                // Widht
-                await doc.table(table, { width: 300 });
-
-                doc.end();
-
-                return filename;
-            },
-            (err) => {
-                console.log(err);
-                return err;
+            if(!sales) {
+                reject(err);
             }
-        );
+
+            const doc = new pdf({margin: 30, size: 'A4'});
+            const filename = `sales_${startDate}_${endDate}.pdf`;
+            doc.pipe(fs.createWriteStream(filename));
+
+            // Table
+            const table = {
+                title: `Vendas entre ${startDate} e ${endDate}`,
+                headers: ['ID', 'Nome do cliente', 'Produto', 'Valor', 'Data da venda', 'ID do vendedor'],
+                rows: sales
+            };
+
+            // Widht
+            await doc.table(table, { width: 300 });
+
+            doc.end();
+
+            resolve(filename);
+        });
     }
 }
 

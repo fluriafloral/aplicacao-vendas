@@ -17,7 +17,7 @@ const userService = {
             
             // Token expires in jwt_token_expiration_time seconds
             const token = jwt.sign({ id: userId }, jwt_key, {expiresIn: jwt_token_expiration_time});
-            return { auth: true, token: token };
+            return token;
         } catch(err) {
             console.log(err);
             return err;
@@ -29,13 +29,17 @@ const userService = {
         return new Promise(async (resolve, reject) => {
             const user = await userRepository.findUser(email);
 
+            if(!user) {
+                return reject(null);
+            }
+
             if(password !== user.password) {
-                return reject({ auth: false, token: null});
+                return reject(1);
             }
 
             // Token expires in jwt_token_expiration_time seconds
             const token = jwt.sign({ id: user.id }, jwt_key, {expiresIn: jwt_token_expiration_time});
-            resolve({ auth: true, token: token });
+            resolve(token);
         });
     }
 }
